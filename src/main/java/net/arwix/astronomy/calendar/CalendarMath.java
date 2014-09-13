@@ -7,14 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.TimeZone;
 
-import static java.util.Calendar.DATE;
-import static java.util.Calendar.HOUR_OF_DAY;
-import static java.util.Calendar.MILLISECOND;
-import static java.util.Calendar.MINUTE;
-import static java.util.Calendar.MONTH;
-import static java.util.Calendar.SECOND;
-import static java.util.Calendar.YEAR;
-import static java.util.Calendar.ZONE_OFFSET;
+import static java.util.Calendar.*;
 
 public abstract class CalendarMath {
 
@@ -74,8 +67,7 @@ public abstract class CalendarMath {
     }
 
     /**
-     * Вычисление модифицированного юлианского дня
-     * без учета временной зоны, временая зона должна учитываться отдельно
+     * Вычисление модифицированного юлианского дня с учетом временной зоны
      * <b> Важно: все числа даты и времени должны быть положительные </b>
      *
      * @param calendar календарь может быть в локальном времени
