@@ -26,24 +26,6 @@ public abstract class AstroMath {
     }
 
     /**
-     * Вычисляет cos(alpha+beta) и sin(alpha+beta) используя теоремы о косинусе и синусе суммы
-     *
-     * @param cos1 cos(alpha)
-     * @param sin1 sin(alpha)
-     * @param cos2 cos(beta)
-     * @param sin2 sin(beta)
-     * @return double[]
-     * 0 - cos(alpha+beta)
-     * 1 - sin(alpha+beta)
-     */
-    public static double[] addThe(double cos1, double sin1, double cos2, double sin2) {
-        double[] r = new double[2];
-        r[0] = cos1 * cos2 - sin1 * sin2;
-        r[1] = sin1 * cos2 + cos1 * sin2;
-        return r;
-    }
-
-    /**
      * Преобразование экваториальных координат в эклиптические
      * Transformation of equatorial to ecliptical coordinates
      *
