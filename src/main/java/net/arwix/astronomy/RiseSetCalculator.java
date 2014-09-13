@@ -88,7 +88,7 @@ public class RiseSetCalculator {
         if (obj == VSOP87Objects.Sun) {
             switch (event) {
                 case RiseSet:
-                    return sin(toRadians(-50.0 / 60.0));
+                    return sin(toRadians(-49.8 / 60.0));
                 case CivilTwilight:
                     return sin(toRadians(-6.0));
                 case NauticalTwilight:
@@ -169,7 +169,7 @@ public class RiseSetCalculator {
         final double refraction = getSinRefractionAngle(event);
         final double lambda = toRadians(longitude);
         final double phi = toRadians(latitude);
-        Calendar innerDate = Calendar.getInstance();
+        Calendar innerDate = Calendar.getInstance(date.getTimeZone());
         innerDate.setTime(date.getTime());
         innerDate.set(Calendar.HOUR_OF_DAY, 0);
         innerDate.set(Calendar.MINUTE, 0);
@@ -206,13 +206,13 @@ public class RiseSetCalculator {
             if (quadResult.roots != null && quadResult.roots.count == 1) {
                 if (y_minus < 0.0) {
                     LT_Rise = hour + quadResult.roots.root1;
-                    riseDate = Calendar.getInstance();
+                    riseDate = Calendar.getInstance(date.getTimeZone());
                     riseDate.setTime(date.getTime());
                     CalendarMath.setHours(riseDate, LT_Rise);
                     rises = true;
                 } else {
                     LT_Set = hour + quadResult.roots.root1;
-                    downDate = Calendar.getInstance();
+                    downDate = Calendar.getInstance(date.getTimeZone());
                     downDate.setTime(date.getTime());
                     CalendarMath.setHours(downDate, LT_Set);
                     sets = true;
@@ -228,8 +228,8 @@ public class RiseSetCalculator {
                     LT_Rise = hour + quadResult.roots.root1;
                     LT_Set = hour + quadResult.roots.root2;
                 }
-                riseDate = Calendar.getInstance();
-                downDate = Calendar.getInstance();
+                riseDate = Calendar.getInstance(date.getTimeZone());
+                downDate = Calendar.getInstance(date.getTimeZone());
                 riseDate.setTime(date.getTime());
                 downDate.setTime(date.getTime());
                 CalendarMath.setHours(riseDate, LT_Rise);
