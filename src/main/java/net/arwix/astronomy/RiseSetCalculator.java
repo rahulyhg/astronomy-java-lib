@@ -1,7 +1,13 @@
 package net.arwix.astronomy;
 
 import net.arwix.astronomy.VSOP87.VSOP87Objects;
+import net.arwix.astronomy.calendar.CalendarMath;
 import net.arwix.astronomy.calendar.SimpleDate;
+import net.arwix.astronomy.coordinates.SphericalVector;
+import net.arwix.astronomy.coordinates.VectorType;
+import net.arwix.astronomy.math.QuadraticInterpolation;
+
+import java.util.Calendar;
 
 import static java.lang.Math.*;
 
@@ -13,13 +19,26 @@ import static java.lang.Math.*;
  */
 public class RiseSetCalculator {
 
+    public static enum Twilight {
+        Civil, Nautical, Astronomical
+    }
+
+    public static enum RiseSetType {
+        Sun, Moon, Star
+    }
+
+    public static enum Culmination {
+        Upper, Lower
+    }
+
     private VSOP87Objects obj;
+
 
     /**
      * Перечесление различных вариантов восхода захода и кульминации
      */
     public static enum Event {
-        RiseSet, CivilTwilight, NautiTwilight, AstroTwilight, UpperCulmination, LowerCulmination
+        RiseSet, CivilTwilight, NauticalTwilight, AstronomicalTwilight, UpperCulmination, LowerCulmination
     }
 
     /**
@@ -30,10 +49,10 @@ public class RiseSetCalculator {
      */
     final public static class Result {
 
-        final public SimpleDate rise, set;
+        final public Calendar rise, set;
         final public boolean above;
 
-        public Result(SimpleDate rise, SimpleDate set, boolean above) {
+        public Result(Calendar rise, Calendar set, boolean above) {
             this.rise = rise;
             this.set = set;
             this.above = above;
@@ -64,17 +83,17 @@ public class RiseSetCalculator {
 
     // TODO Moon sin(toRadians(+8.0 / 60.0)
     private double getSinRefractionAngle(Event event) {
-        if (!(obj instanceof VSOP87Objects.Sun) && (event != Event.RiseSet))
+        if (!(obj == VSOP87Objects.Sun) && (event != Event.RiseSet))
             throw new IndexOutOfBoundsException();
-        if (obj instanceof VSOP87Objects.Sun) {
+        if (obj == VSOP87Objects.Sun) {
             switch (event) {
                 case RiseSet:
                     return sin(toRadians(-50.0 / 60.0));
                 case CivilTwilight:
                     return sin(toRadians(-6.0));
-                case NautiTwilight:
+                case NauticalTwilight:
                     return sin(toRadians(-12.0));
-                case AstroTwilight:
+                case AstronomicalTwilight:
                     return sin(toRadians(-18.0));
             }
         }
@@ -93,46 +112,46 @@ public class RiseSetCalculator {
     private double getSinAltitude(double MJD, double longitudeRAD, double cosPhi,
                                   double sinPhi) {
         final double T, tau;
-        final Polar p;
+        final SphericalVector p;
 
-        T = (MJD - MJD_J2000) / 36525.0;
-        p = obj.getLowPrecisionEquatorialCoordinates(T);
+        T = (MJD - Constant.MJD_J2000) / 36525.0;
+        p = (SphericalVector) obj.getGeoEquatorialPosition(T, Epoch.APPARENT).getVectorInType(VectorType.SPHERICAL);
 
         // часовой угол
-        tau = Date.getGMST(MJD) + longitudeRAD - p.elements[PHI];
+        tau = CalendarMath.getGMST(MJD) + longitudeRAD - p.phi;
 
-        return sinPhi * sin(p.elements[THETA]) + cosPhi * cos(p.elements[THETA]) * cos(tau);
+        return sinPhi * sin(p.theta) + cosPhi * cos(p.theta) * cos(tau);
     }
 
-    final public ResultCulmination getCulmination(Date date, double longitude, double latitude) {
-
-        // для вычисления экстремума не нужен но нужен для потнятия выше или ниже горизонта
-        final double refraction = getSinRefractionAngle(Event.RiseSet);
-        final double lambda = toRadians(longitude);
-        final double phi = toRadians(latitude);
-        Date innerDate = date.clone();
-        innerDate.resetTime();
-        final double MJD0 = innerDate.getMJD(true) + innerDate.getDeltaMJD();
-        final double Cphi = cos(phi);
-        final double Sphi = sin(phi);
-
-        SearchExtremumGoldenSection.Function function = new SearchExtremumGoldenSection.Function() {
-            public double calculation(double x) {
-                return getSinAltitude(MJD0 + x / 24.0, lambda, Cphi, Sphi) - refraction;
-            }
-        };
-
-        SearchExtremumGoldenSection culmination = new SearchExtremumGoldenSection(function, 0,
-                24.0, Math.ulp(100), 50);
-
-        Date upperCulmination = innerDate.clone().setTime(new Time(culmination.getMax()));
-        boolean aboveUpper = (getSinAltitude(
-                upperCulmination.getMJD(true) + upperCulmination.getDeltaMJD(), lambda, Cphi, Sphi) - refraction) > 0;
-        Date lowerCulmination = innerDate.clone().setTime(new Time(culmination.getMin()));
-        boolean aboveLower = (getSinAltitude(
-                lowerCulmination.getMJD(true) + lowerCulmination.getDeltaMJD(), lambda, Cphi, Sphi) - refraction) > 0;
-        return new ResultCulmination(upperCulmination, lowerCulmination, aboveUpper, aboveLower);
-    }
+//    final public ResultCulmination getCulmination(Date date, double longitude, double latitude) {
+//
+//        // для вычисления экстремума не нужен но нужен для потнятия выше или ниже горизонта
+//        final double refraction = getSinRefractionAngle(Event.RiseSet);
+//        final double lambda = toRadians(longitude);
+//        final double phi = toRadians(latitude);
+//        Date innerDate = date.clone();
+//        innerDate.resetTime();
+//        final double MJD0 = innerDate.getMJD(true) + innerDate.getDeltaMJD();
+//        final double Cphi = cos(phi);
+//        final double Sphi = sin(phi);
+//
+//        SearchExtremumGoldenSection.Function function = new SearchExtremumGoldenSection.Function() {
+//            public double calculation(double x) {
+//                return getSinAltitude(MJD0 + x / 24.0, lambda, Cphi, Sphi) - refraction;
+//            }
+//        };
+//
+//        SearchExtremumGoldenSection culmination = new SearchExtremumGoldenSection(function, 0,
+//                24.0, Math.ulp(100), 50);
+//
+//        Date upperCulmination = innerDate.clone().setTime(new Time(culmination.getMax()));
+//        boolean aboveUpper = (getSinAltitude(
+//                upperCulmination.getMJD(true) + upperCulmination.getDeltaMJD(), lambda, Cphi, Sphi) - refraction) > 0;
+//        Date lowerCulmination = innerDate.clone().setTime(new Time(culmination.getMin()));
+//        boolean aboveLower = (getSinAltitude(
+//                lowerCulmination.getMJD(true) + lowerCulmination.getDeltaMJD(), lambda, Cphi, Sphi) - refraction) > 0;
+//        return new ResultCulmination(upperCulmination, lowerCulmination, aboveUpper, aboveLower);
+//    }
 
     /**
      * Расчет моментов восхода/захода Солнца и наступления сумерек
@@ -144,16 +163,20 @@ public class RiseSetCalculator {
      * @param latitude  широта в градусах и десятичных долях градуса
      * @return @see RiseSet
      */
-    final public Result getRiseSet(Event event, Date date, double longitude, double latitude) {
+    final public Result getRiseSet(Event event, Calendar date, double longitude, double latitude) {
         // latitude = 65.5;
         // 27.05.2012
         final double refraction = getSinRefractionAngle(event);
         final double lambda = toRadians(longitude);
         final double phi = toRadians(latitude);
-        Date innerDate = date.clone();
-        innerDate.resetTime();
-        Date riseDate = null, downDate = null;
-        final double MJD0 = innerDate.getMJD(true) + innerDate.getDeltaMJD();
+        Calendar innerDate = Calendar.getInstance();
+        innerDate.setTime(date.getTime());
+        innerDate.set(Calendar.HOUR_OF_DAY, 0);
+        innerDate.set(Calendar.MINUTE, 0);
+        innerDate.set(Calendar.SECOND, 0);
+        innerDate.set(Calendar.MILLISECOND, 0);
+        Calendar riseDate = null, downDate = null;
+        final double MJD0 = CalendarMath.getMJD(innerDate) + CalendarMath.getDeltaTofDay(innerDate);
         final double Cphi = cos(phi);
         final double Sphi = sin(phi);
 
@@ -183,11 +206,15 @@ public class RiseSetCalculator {
             if (quadResult.roots != null && quadResult.roots.count == 1) {
                 if (y_minus < 0.0) {
                     LT_Rise = hour + quadResult.roots.root1;
-                    riseDate = innerDate.clone().setTime(new Time(LT_Rise));
+                    riseDate = Calendar.getInstance();
+                    riseDate.setTime(date.getTime());
+                    CalendarMath.setHours(riseDate, LT_Rise);
                     rises = true;
                 } else {
                     LT_Set = hour + quadResult.roots.root1;
-                    downDate = innerDate.clone().setTime(new Time(LT_Set));
+                    downDate = Calendar.getInstance();
+                    downDate.setTime(date.getTime());
+                    CalendarMath.setHours(downDate, LT_Set);
                     sets = true;
                 }
             }
@@ -201,8 +228,12 @@ public class RiseSetCalculator {
                     LT_Rise = hour + quadResult.roots.root1;
                     LT_Set = hour + quadResult.roots.root2;
                 }
-                riseDate = innerDate.clone().setTime(new Time(LT_Rise));
-                downDate = innerDate.clone().setTime(new Time(LT_Set));
+                riseDate = Calendar.getInstance();
+                downDate = Calendar.getInstance();
+                riseDate.setTime(date.getTime());
+                downDate.setTime(date.getTime());
+                CalendarMath.setHours(riseDate, LT_Rise);
+                CalendarMath.setHours(downDate, LT_Set);
                 rises = true;
                 sets = true;
             }
