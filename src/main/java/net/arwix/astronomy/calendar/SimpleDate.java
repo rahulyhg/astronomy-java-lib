@@ -2,14 +2,7 @@ package net.arwix.astronomy.calendar;
 
 import java.util.Calendar;
 
-import static java.util.Calendar.DATE;
-import static java.util.Calendar.HOUR_OF_DAY;
-import static java.util.Calendar.MILLISECOND;
-import static java.util.Calendar.MINUTE;
-import static java.util.Calendar.MONTH;
-import static java.util.Calendar.SECOND;
-import static java.util.Calendar.YEAR;
-import static java.util.Calendar.ZONE_OFFSET;
+import static java.util.Calendar.*;
 
 public class SimpleDate {
 
@@ -30,6 +23,26 @@ public class SimpleDate {
         minute = calendar.get(MINUTE);
         seconds = calendar.get(SECOND) + calendar.get(MILLISECOND) / 1000.0;
         zoneOffset = calendar.get(ZONE_OFFSET);
+    }
+
+    public SimpleDate(SimpleDate date) {
+        year = date.year;
+        month = date.month;
+        day = date.day;
+        hour = date.hour;
+        minute = date.minute;
+        seconds = date.seconds;
+        zoneOffset = date.zoneOffset;
+    }
+
+    /**
+     * Устанавливает время в 00:00:00
+     * не срасывает временую зону
+     */
+    public void resetTime() {
+        hour = 0;
+        minute = 0;
+        seconds = 0.0;
     }
 
 
