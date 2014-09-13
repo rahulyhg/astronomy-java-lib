@@ -60,4 +60,9 @@ public class SphericalVector extends Vector {
     public VectorType getType() {
         return VectorType.SPHERICAL;
     }
+
+    @Override
+    public double[] toArray() {
+        return new double[]{this.phi, this.theta, this.r};
+    }
 }

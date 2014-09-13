@@ -40,6 +40,7 @@ public class RectangularVector extends Vector {
         return VectorType.RECTANGULAR;
     }
 
+    @Override
     public double[] toArray() {
         return new double[]{this.x, this.y, this.z};
     }

@@ -1,9 +1,6 @@
 package net.arwix.astronomy.coordinates;
 
-import static java.lang.Math.atan2;
-import static java.lang.Math.cos;
-import static java.lang.Math.sin;
-import static java.lang.Math.sqrt;
+import static java.lang.Math.*;
 
 public abstract class Vector {
 
@@ -171,6 +168,8 @@ public abstract class Vector {
     }
 
     public abstract VectorType getType();
+
+    public abstract double[] toArray();
 
     public Vector getVectorInType(VectorType type) {
         return this.getType() == type ? this : convert(this, type);
