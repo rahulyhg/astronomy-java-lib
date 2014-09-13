@@ -47,6 +47,30 @@ public abstract class CalendarMath {
         return new CalendarFormater();
     }
 
+
+    /**
+     * Устанавливает время в календаре используя доли часа
+     * Новый объект не создается
+     *
+     * @param calendar календарь в котором будет установлено время
+     * @param hours    часы в формате час.десятичные доли часа
+     * @return Calendar
+     */
+    public static Calendar setHours(Calendar calendar, double hours) {
+        final int hour = (int) hours;
+        final double minutes = (hours - hour) * 60.0;
+        final int minute = (int) minutes;
+        final double seconds = (minutes - minute) * 60.0;
+        final int second = (int) seconds;
+        final int millisecond = (int) ((seconds - second) * 1000.0);
+
+        calendar.set(HOUR_OF_DAY, hour);
+        calendar.set(MINUTE, minute);
+        calendar.set(SECOND, second);
+        calendar.set(MILLISECOND, millisecond);
+        return calendar;
+    }
+
     /**
      * Конвертация в UTC календарь
      *
