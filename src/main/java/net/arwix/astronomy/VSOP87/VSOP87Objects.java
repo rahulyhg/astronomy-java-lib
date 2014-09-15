@@ -1,13 +1,10 @@
 package net.arwix.astronomy.VSOP87;
 
-import net.arwix.astronomy.AstroMath;
-import net.arwix.astronomy.Constant;
-import net.arwix.astronomy.Epoch;
-import net.arwix.astronomy.HeliocentricEclipticPosition;
+import net.arwix.astronomy.*;
 import net.arwix.astronomy.coordinates.RectangularVector;
 import net.arwix.astronomy.coordinates.Vector;
 
-public enum VSOP87Objects implements HeliocentricEclipticPosition {
+public enum VSOP87Objects implements HeliocentricEclipticPosition, GeocentricEquatorialPosition {
 
 
     Sun, Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune;
@@ -15,8 +12,9 @@ public enum VSOP87Objects implements HeliocentricEclipticPosition {
     /**
      * get geometric heliocentric ecliptic coordinates
      *
+     * @param T Юлианские столетия (ET) Time in Julian centuries since J2000
      * @param epoch эпоха
-     * @return координаты
+     * @return Vector
      */
     public Vector getHeliocentricEclipticPosition(double T, Epoch epoch) {
         switch (epoch) {
@@ -28,7 +26,14 @@ public enum VSOP87Objects implements HeliocentricEclipticPosition {
         return null;
     }
 
-    public Vector getGeoEquatorialPosition(double T, Epoch epoch) {
+    /**
+     * Вычисляет геоцентрические (в центре Земля) экваториальные координаты
+     *
+     * @param T     Юлианские столетия (ET) Time in Julian centuries since J2000
+     * @param epoch эпоха
+     * @return Vector
+     */
+    public Vector getGeocentricEquatorialPosition(double T, Epoch epoch) {
         Vector earthEcliptical = Earth.getHeliocentricEclipticPosition(T, epoch);
         Vector objEcliptical = this.getHeliocentricEclipticPosition(T, epoch);
         Vector objGeoEcliptic = Vector.substract(objEcliptical, earthEcliptical);
