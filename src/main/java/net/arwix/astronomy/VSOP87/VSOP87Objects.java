@@ -3,11 +3,11 @@ package net.arwix.astronomy.VSOP87;
 import net.arwix.astronomy.AstroMath;
 import net.arwix.astronomy.Constant;
 import net.arwix.astronomy.Epoch;
-import net.arwix.astronomy.HelioEclipticPosition;
+import net.arwix.astronomy.HeliocentricEclipticPosition;
 import net.arwix.astronomy.coordinates.RectangularVector;
 import net.arwix.astronomy.coordinates.Vector;
 
-public enum VSOP87Objects {
+public enum VSOP87Objects implements HeliocentricEclipticPosition {
 
 
     Sun, Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune;
@@ -18,7 +18,7 @@ public enum VSOP87Objects {
      * @param epoch эпоха
      * @return координаты
      */
-    public Vector getHelioEclipticPosition(double T, Epoch epoch) {
+    public Vector getPosition(double T, Epoch epoch) {
         switch (epoch) {
             case APPARENT:
                 return new PositionApparent(this).getEclipticCoordinates(T);
@@ -29,26 +29,26 @@ public enum VSOP87Objects {
     }
 
     public Vector getGeoEquatorialPosition(double T, Epoch epoch) {
-        Vector earthEcliptical = Earth.getHelioEclipticPosition(T, epoch);
-        Vector objEcliptical = this.getHelioEclipticPosition(T, epoch);
+        Vector earthEcliptical = Earth.getPosition(T, epoch);
+        Vector objEcliptical = this.getPosition(T, epoch);
         Vector objGeoEcliptic = Vector.substract(objEcliptical, earthEcliptical);
         final double dT = objGeoEcliptic.norm() / Constant.C_Light / 36525.0;
         T = T - dT;
         switch (epoch) {
             case APPARENT:
-                earthEcliptical = Earth.getHelioEclipticPosition(T, epoch);
-                objEcliptical = this.getHelioEclipticPosition(T, epoch);
+                earthEcliptical = Earth.getPosition(T, epoch);
+                objEcliptical = this.getPosition(T, epoch);
                 objGeoEcliptic = Vector.substract(objEcliptical, earthEcliptical);
                 return AstroMath.getNutation(T).Multiply(AstroMath.getEclipticalToEquatorialCoordinates(T)).MultiplyMV(objGeoEcliptic);
             case J2000:
-                objEcliptical = this.getHelioEclipticPosition(T, epoch);
+                objEcliptical = this.getPosition(T, epoch);
                 objGeoEcliptic = Vector.substract(objEcliptical, earthEcliptical);
                 return AstroMath.getEclipticalToEquatorialCoordinates(Constant.T_J2000).MultiplyMV(objGeoEcliptic);
         }
         return null;
     }
 
-    private static class PositionJ2000 implements HelioEclipticPosition {
+    private static class PositionJ2000 {
         private final VSOP87Objects mObject;
 
         private PositionJ2000(VSOP87Objects object) {
@@ -105,7 +105,7 @@ public enum VSOP87Objects {
         }
     }
 
-    private class PositionApparent implements HelioEclipticPosition {
+    private class PositionApparent {
         private final VSOP87Objects mObject;
 
         private PositionApparent(VSOP87Objects object) {
