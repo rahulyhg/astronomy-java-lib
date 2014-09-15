@@ -5,7 +5,7 @@ import net.arwix.astronomy.coordinates.Vector;
 /**
  * Вычисляет геоцентрические (в центре Земля) экваториальные координаты
  */
-public interface GeocentricEquatorialPosition {
+public interface GeocentricEquatorialCoordinates {
 
 
     /**

@@ -4,7 +4,7 @@ import net.arwix.astronomy.*;
 import net.arwix.astronomy.coordinates.RectangularVector;
 import net.arwix.astronomy.coordinates.Vector;
 
-public enum VSOP87Objects implements HeliocentricEclipticPosition, GeocentricEquatorialPosition {
+public enum VSOP87Objects implements HeliocentricEclipticCoordinates, GeocentricEquatorialCoordinates {
 
 
     Sun, Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune;

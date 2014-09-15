@@ -6,7 +6,7 @@ import net.arwix.astronomy.coordinates.Vector;
  * Вычисляет гелеоцентрические (в центре Солнце) эклиптические координаты
  * Computes ecliptical position using analytical series
  */
-public interface HeliocentricEclipticPosition {
+public interface HeliocentricEclipticCoordinates {
 
     /**
      * Вычисляет гелеоцентрические эклиптические координаты
