@@ -19,19 +19,60 @@ import static java.lang.Math.*;
  */
 public class RiseSetCalculator {
 
-    public static enum Twilight {
-        Civil, Nautical, Astronomical
-    }
+//    public static enum Twilight {
+//        Civil, Nautical, Astronomical
+//    }
 
-    public static enum RiseSetType {
-        Sun, Moon, Star
+    public static enum ObjectType {
+        Sun(-0.833), Moon(+0.133), Dot(-0.5667);
+
+        private double sinRefractionAngle;
+
+        private ObjectType(double angle) {
+            this.sinRefractionAngle = sin(toRadians(angle));
+        }
+
+        private double getSinRefractionAngle() {
+            return this.sinRefractionAngle;
+        }
+
     }
 
     public static enum Culmination {
         Upper, Lower
     }
 
-    private VSOP87Objects obj;
+    private Calendar calendar;
+    private ObjectType objectType;
+    private HeliocentricEclipticCoordinates coordinates;
+    private boolean isValid = false;
+
+    private GeocentricEquatorialCoordinates obj;
+
+    public RiseSetCalculator(ObjectType type, HeliocentricEclipticCoordinates coordinates) {
+        this.objectType = type;
+        this.coordinates = coordinates;
+
+    }
+
+    public void setDate(Calendar calendar) {
+        this.isValid = false;
+        this.calendar = calendar;
+
+
+    }
+
+    public Calendar getDate() {
+        return this.calendar;
+    }
+
+    public void calls() {
+
+    }
+
+    public void getSet() {
+
+    }
 
 
     /**
@@ -81,24 +122,24 @@ public class RiseSetCalculator {
         this.obj = object;
     }
 
-    // TODO Moon sin(toRadians(+8.0 / 60.0)
-    private double getSinRefractionAngle(Event event) {
-        if (!(obj == VSOP87Objects.Sun) && (event != Event.RiseSet))
-            throw new IndexOutOfBoundsException();
-        if (obj == VSOP87Objects.Sun) {
-            switch (event) {
-                case RiseSet:
-                    return sin(toRadians(-49.8 / 60.0));
-                case CivilTwilight:
-                    return sin(toRadians(-6.0));
-                case NauticalTwilight:
-                    return sin(toRadians(-12.0));
-                case AstronomicalTwilight:
-                    return sin(toRadians(-18.0));
-            }
-        }
-        return sin(toRadians(-34.0 / 60.0));
-    }
+//    // TODO Moon sin(toRadians(+8.0 / 60.0)
+//    private double getSinRefractionAngle(Event event) {
+//        if (!(obj == VSOP87Objects.Sun) && (event != Event.RiseSet))
+//            throw new IndexOutOfBoundsException();
+//        if (obj == VSOP87Objects.Sun) {
+//            switch (event) {
+//                case RiseSet:
+//                    return sin(toRadians(-50 / 60.0));
+//                case CivilTwilight:
+//                    return sin(toRadians(-6.0));
+//                case NauticalTwilight:
+//                    return sin(toRadians(-12.0));
+//                case AstronomicalTwilight:
+//                    return sin(toRadians(-18.0));
+//            }
+//        }
+//        return sin(toRadians(-34.0 / 60.0));
+//    }
 
     /**
      * Синус высоты объекта над горизонтом
@@ -115,7 +156,8 @@ public class RiseSetCalculator {
         final SphericalVector p;
 
         T = (MJD - Constant.MJD_J2000) / 36525.0;
-        p = (SphericalVector) obj.getGeoEquatorialPosition(T, Epoch.APPARENT).getVectorInType(VectorType.SPHERICAL);
+        System.out.print(T - (MJD - Constant.MJD_J2000) / 36525.0);
+        p = (SphericalVector) obj.getGeocentricEquatorialPosition(T, Epoch.APPARENT).getVectorInType(VectorType.SPHERICAL);
 
         // часовой угол
         tau = CalendarMath.getGMST(MJD) + longitudeRAD - p.phi;
@@ -166,7 +208,7 @@ public class RiseSetCalculator {
     final public Result getRiseSet(Event event, Calendar date, double longitude, double latitude) {
         // latitude = 65.5;
         // 27.05.2012
-        final double refraction = getSinRefractionAngle(event);
+        final double refraction = 0; // getSinRefractionAngle(event);
         final double lambda = toRadians(longitude);
         final double phi = toRadians(latitude);
         Calendar innerDate = Calendar.getInstance(date.getTimeZone());
@@ -176,7 +218,8 @@ public class RiseSetCalculator {
         innerDate.set(Calendar.SECOND, 0);
         innerDate.set(Calendar.MILLISECOND, 0);
         Calendar riseDate = null, downDate = null;
-        final double MJD0 = CalendarMath.getMJD(innerDate) + CalendarMath.getDeltaTofDay(innerDate);
+        final double MJD0 = CalendarMath.getMJD(innerDate); // - CalendarMath.getDeltaTofDay(innerDate);
+        System.out.print(CalendarMath.getDeltaTofDay(innerDate));
         final double Cphi = cos(phi);
         final double Sphi = sin(phi);
 
