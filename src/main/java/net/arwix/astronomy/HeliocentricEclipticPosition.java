@@ -9,11 +9,11 @@ import net.arwix.astronomy.coordinates.Vector;
 public interface HeliocentricEclipticPosition {
 
     /**
-     * Вычисляет эклиптические координаты
+     * Вычисляет гелеоцентрические эклиптические координаты
      *
      * @param T Юлианские столетия (ET) Time in Julian centuries since J2000
      * @param epoch эпоха
      * @return Гелиоцентрическая позиция в а.е. относительно эклиптики и равноденствия даты или J2000 зависит от конкретного исполнения
      */
-    public Vector getPosition(double T, Epoch epoch);
+    public Vector getHeliocentricEclipticPosition(double T, Epoch epoch);
 }
