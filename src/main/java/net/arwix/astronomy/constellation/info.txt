@@ -1,0 +1,2 @@
+ftp://cdsarc.u-strasbg.fr/cats/6/49/
+ftp://cdsarc.u-strasbg.fr/pub/cats/VI/42
