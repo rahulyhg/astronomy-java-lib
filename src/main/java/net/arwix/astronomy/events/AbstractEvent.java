@@ -22,10 +22,10 @@ import static java.lang.Math.sin;
  */
 abstract class AbstractEvent {
 
-    private Calendar date, innerDate;
-    private Location location;
+    protected Calendar date, innerDate;
+    protected Location location;
     private GeocentricEquatorialCoordinates coordinates;
-    private double deltaT;
+    protected double deltaT;
 
     protected boolean isValid;
     protected Calendar riseDate, downDate;
@@ -58,7 +58,7 @@ abstract class AbstractEvent {
         return this.location;
     }
 
-    private void resetTimeInnerDate() {
+    protected void resetTimeInnerDate() {
         this.innerDate.set(Calendar.HOUR_OF_DAY, 0);
         this.innerDate.set(Calendar.MINUTE, 0);
         this.innerDate.set(Calendar.SECOND, 0);
@@ -74,7 +74,7 @@ abstract class AbstractEvent {
      * @param sinLatitude синус широты
      * @return cинус высоты Солнца или Луны в момент искомого события
      */
-    private double getSinAltitude(double MJD, double longitude, double cosLatitude,
+    protected double getSinAltitude(double MJD, double longitude, double cosLatitude,
                                   double sinLatitude) {
         final double T, tau;
         final SphericalVector p;
