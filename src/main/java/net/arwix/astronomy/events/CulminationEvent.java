@@ -44,8 +44,9 @@ public class CulminationEvent extends AbstractEvent {
 
         lowerTime = Calendar.getInstance(getDate().getTimeZone());
         lowerTime.setTime(getDate().getTime());
-        lowerAbove = (getSinAltitude(CalendarMath.getMJD(lowerTime), location.longitude, cosLatitude, sinLatitude) - sinRefractionAngle) > 0.0;
         CalendarMath.setHours(lowerTime, culmination.getMin());
+        lowerAbove = (getSinAltitude(CalendarMath.getMJD(lowerTime), location.longitude, cosLatitude, sinLatitude) - sinRefractionAngle) > 0.0;
+
         isValid = true;
     }
 
@@ -70,7 +71,7 @@ public class CulminationEvent extends AbstractEvent {
         return lowerTime;
     }
 
-    public boolean isLoverAbove() {
+    public boolean isLowerAbove() {
         if (!isValid) {
             calc();
         }
