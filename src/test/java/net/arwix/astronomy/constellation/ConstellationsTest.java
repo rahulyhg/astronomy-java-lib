@@ -29,6 +29,6 @@ public class ConstellationsTest extends TestCase {
 
         SphericalVector sphericalVector = (SphericalVector) precession.MultiplyMV(vector).getVectorInType(VectorType.SPHERICAL);
         String cons = Constellations.cns_pick(sphericalVector.phi, sphericalVector.theta);
-        Assert.assertEquals("Identification of a Constellation From Position test ", "Лебедь (Cyg: Cygnus)", cons);
+        Assert.assertEquals("Identification of a Constellation From Position test ", "Cyg", cons);
     }
 }
