@@ -35,6 +35,9 @@ public class SimpleDate {
         zoneOffset = date.zoneOffset;
     }
 
+    public SimpleDate() {
+    }
+
     /**
      * Устанавливает время в 00:00:00
      * не срасывает временую зону
